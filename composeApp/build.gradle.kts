@@ -56,6 +56,10 @@ kotlin {
             implementation(libs.ktor.client.darwin)
             implementation(libs.stately.common)
         }
+
+        all {
+            languageSettings.optIn("androidx.compose.material3.ExperimentalMaterial3Api")
+        }
     }
 }
 

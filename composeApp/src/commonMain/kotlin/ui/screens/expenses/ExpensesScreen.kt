@@ -1,0 +1,143 @@
+package ui.screens.expenses
+
+import Expense
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.model.rememberScreenModel
+import cafe.adriel.voyager.core.screen.Screen
+import io.github.oshai.kotlinlogging.KotlinLogging
+import ui.theme.BorderRadius
+import ui.theme.IconSize
+import ui.theme.Spacing
+
+private val logger = KotlinLogging.logger {}
+
+object ExpensesScreen : Screen {
+    @Composable
+    override fun Content() {
+        val viewModel = rememberScreenModel { ExpensesScreenViewModel() }
+        val state by viewModel.state.collectAsState()
+        val onExpenseClicked: (Expense) -> Unit = {
+            logger.info { "Redirect to edit screen" }
+        }
+
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text("My subscriptions", style = MaterialTheme.typography.titleMedium)
+                    },
+                )
+            },
+            bottomBar = {
+                BottomAppBar(
+                    contentPadding = PaddingValues(horizontal = Spacing.Large),
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Column {
+                            Text(
+                                "Average expenses",
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                            Text(
+                                "Per month".uppercase(),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+                        Text(
+                            state.avgExpenses,
+                            style = MaterialTheme.typography.labelLarge,
+                        )
+                    }
+                }
+            },
+        ) { paddingValues ->
+            Box(modifier = Modifier.padding(paddingValues)) {
+                ExpenseList(state.data, onExpenseClicked)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExpenseList(
+    expenses: List<Expense>,
+    onClick: (expense: Expense) -> Unit,
+) {
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(Spacing.Small_100),
+    ) {
+        items(
+            items = expenses,
+            key = { it.id },
+        ) { expense ->
+            ExpenseListItem(
+                expense = expense,
+                onClick = {
+                    logger.info { "Clicked on ${expense.name}" }
+                    onClick(expense)
+                },
+            )
+        }
+
+        item {
+            Spacer(Modifier.height(Spacing.Medium))
+        }
+    }
+}
+
+@Composable
+private fun ExpenseListItem(
+    expense: Expense,
+    onClick: () -> Unit = {},
+) {
+    Surface(
+        modifier =
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Spacing.Medium)
+            .defaultMinSize(minHeight = 56.dp),
+        onClick = onClick,
+        shape = RoundedCornerShape(BorderRadius.small),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+    ) {
+        Row(
+            modifier =
+            Modifier
+                .padding(
+                    horizontal = Spacing.Medium_100,
+                    vertical = Spacing.Small_100,
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacing.Large),
+        ) {
+            Text(
+                text = expense.icon ?: "",
+                fontSize = IconSize.Medium,
+                modifier = Modifier.defaultMinSize(minWidth = 24.dp),
+            )
+            Text(
+                text = expense.name,
+                style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = (expense.price).toString(),
+                style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+            )
+        }
+    }
+}
