@@ -13,7 +13,7 @@ data class ExpensePageProperties(
 )
 
 @Serializable
-class TitleProperty {
+class TitleProperty(val id: String, val title: List<Value>) {
     @Serializable
     data class Value(
         @SerialName("plain_text")
