@@ -1,10 +1,11 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.buildKonfig)
 }
 
 kotlin {
@@ -50,7 +51,6 @@ kotlin {
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
-            implementation(libs.dotenv.kotlin)
             implementation(libs.kotlinx.coroutines.swing)
         }
         iosMain.dependencies {
@@ -74,5 +74,14 @@ compose.desktop {
             packageName = "org.expense.tracker"
             packageVersion = "1.0.0"
         }
+    }
+}
+
+buildkonfig {
+    packageName = "org.expense.tracker"
+
+    defaultConfigs {
+        buildConfigField(STRING, "NOTION_TOKEN", env.fetchOrNull("NOTION_TOKEN") ?: "")
+        buildConfigField(STRING, "NOTION_DATABASE_ID", env.fetchOrNull("NOTION_DATABASE_ID") ?: "")
     }
 }
