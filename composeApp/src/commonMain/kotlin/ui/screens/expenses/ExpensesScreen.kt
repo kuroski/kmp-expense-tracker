@@ -99,24 +99,35 @@ object ExpensesScreen : Screen {
                                     modifier = Modifier.width(Width.Medium),
                                 )
                             }
+                            ExpenseList(
+                                state.lastSuccessData,
+                                onExpenseClicked,
+                            )
                         }
                     }
 
                     is RemoteData.Failure -> {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(
-                                Spacing.Small,
-                                alignment = Alignment.CenterVertically
-                            ),
-                        ) {
-                            Text("Oops, something went wrong", style = MaterialTheme.typography.titleMedium)
-                            Text("Try refreshing")
-                            FilledIconButton(
-                                onClick = { viewModel.fetchExpenses() },
+                        if (state.lastSuccessData.isNotEmpty()) {
+                            ExpenseList(
+                                state.lastSuccessData,
+                                onExpenseClicked,
+                            )
+                        } else {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(
+                                    Spacing.Small,
+                                    alignment = Alignment.CenterVertically
+                                ),
                             ) {
-                                Icon(Icons.Default.Refresh, contentDescription = null)
+                                Text("Oops, something went wrong", style = MaterialTheme.typography.titleMedium)
+                                Text("Try refreshing")
+                                FilledIconButton(
+                                    onClick = { viewModel.fetchExpenses() },
+                                ) {
+                                    Icon(Icons.Default.Refresh, contentDescription = null)
+                                }
                             }
                         }
                     }
