@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.koin.compose.koinInject
 import ui.theme.BorderRadius
 import ui.theme.IconSize
 import ui.theme.Spacing
@@ -30,6 +31,7 @@ object ExpensesScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
+        val snackbarHostState = koinInject<SnackbarHostState>()
         val viewModel = getScreenModel<ExpensesScreenViewModel>()
         val state by viewModel.state.collectAsState()
         val onExpenseClicked: (Expense) -> Unit = {
@@ -39,7 +41,7 @@ object ExpensesScreen : Screen {
         LaunchedEffect(state.data) {
             val remoteData = state.data
             if (remoteData is RemoteData.Failure) {
-                logger.error { remoteData.error.message ?: "Something went wrong" }
+                snackbarHostState.showSnackbar(remoteData.error.message ?: "Something went wrong")
             }
         }
 
