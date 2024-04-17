@@ -1,6 +1,7 @@
 package ui.screens.expenses
 
 import Expense
+import ExpenseRepository
 import api.APIClient
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -21,7 +22,7 @@ data class ExpensesScreenState(
         get() = formatPrice(lastSuccessData.map { it.price }.average().toInt())
 }
 
-class ExpensesScreenViewModel(private val apiClient: APIClient) : StateScreenModel<ExpensesScreenState>(
+class ExpensesScreenViewModel(private val expenseRepository: ExpenseRepository) : StateScreenModel<ExpensesScreenState>(
     ExpensesScreenState(
         data = RemoteData.NotAsked,
     ),
@@ -30,26 +31,19 @@ class ExpensesScreenViewModel(private val apiClient: APIClient) : StateScreenMod
         fetchExpenses()
     }
 
-    fun fetchExpenses() {
+    fun fetchExpenses(forceUpdate: Boolean = false) {
         mutableState.value = mutableState.value.copy(data = RemoteData.Loading)
 
         screenModelScope.launch {
             try {
-                logger.info { "Fetching expenses" }
-                val database = apiClient.queryDatabaseOrThrow(Env.NOTION_DATABASE_ID)
-                val expenses = database.results.map {
-                    Expense(
-                        id = it.id,
-                        name = it.properties.expense.title.firstOrNull()?.plainText ?: "-",
-                        icon = it.icon?.emoji,
-                        price = it.properties.amount.number,
-                    )
+                expenseRepository.all(forceUpdate).collect { expenses ->
+                    logger.info { "Expenses list was updated" }
+                    mutableState.value =
+                        ExpensesScreenState(
+                            lastSuccessData = expenses,
+                            data = RemoteData.success(expenses),
+                        )
                 }
-                mutableState.value =
-                    ExpensesScreenState(
-                        lastSuccessData = expenses,
-                        data = RemoteData.success(expenses),
-                    )
             } catch (cause: Throwable) {
                 logger.error { "Cause ${cause.message}" }
                 cause.printStackTrace()
