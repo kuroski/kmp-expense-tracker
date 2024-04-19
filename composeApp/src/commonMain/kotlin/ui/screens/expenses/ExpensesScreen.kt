@@ -51,7 +51,7 @@ object ExpensesScreen : Screen {
                     navigationIcon = {
                         IconButton(
                             enabled = state.data !is RemoteData.Loading,
-                            onClick = { viewModel.fetchExpenses() },
+                            onClick = { viewModel.fetchExpenses(forceUpdate = true) },
                         ) {
                             Icon(Icons.Default.Refresh, contentDescription = null)
                         }
