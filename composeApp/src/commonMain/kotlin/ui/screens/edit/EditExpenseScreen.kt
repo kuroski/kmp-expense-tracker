@@ -21,12 +21,12 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.launch
 import org.koin.core.parameter.parametersOf
+import ui.components.EmojiPicker
 import ui.components.InputField
 import ui.theme.Spacing
 import utils.form.CurrencyAmountInputVisualTransformation
 import utils.form.FieldState
 import utils.form.FormStatus
-import utils.form.getOrNull
 
 private val logger = KotlinLogging.logger {}
 
@@ -83,8 +83,7 @@ data class EditExpenseScreen(val expense: Expense? = null) : Screen {
                     shape = MaterialTheme.shapes.extraLarge,
                 ) {
                     Text(
-                        text = "Submit",
-                        style = MaterialTheme.typography.bodyLarge,
+                        text = "Submit", style = MaterialTheme.typography.bodyLarge,
                     )
                 }
             },
@@ -112,7 +111,10 @@ fun Form(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(Spacing.Large),
     ) {
-        Text("Emoji picker")
+        EmojiPicker(
+            value = (state.formData.icon as? FieldState.Valid)?.text ?: "",
+            onSelect = viewModel.onFieldChange(FormData::validateIcon),
+        )
 
         InputField(
             label = "Name",
