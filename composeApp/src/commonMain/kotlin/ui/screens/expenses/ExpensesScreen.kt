@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -60,6 +61,14 @@ object ExpensesScreen : Screen {
                     },
                     title = {
                         Text("My subscriptions", style = MaterialTheme.typography.titleMedium)
+                    },
+                    actions = {
+                        IconButton(
+                            enabled = state.data !is RemoteData.Loading,
+                            onClick = { navigator.push(EditExpenseScreen()) },
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = null)
+                        }
                     },
                 )
             },

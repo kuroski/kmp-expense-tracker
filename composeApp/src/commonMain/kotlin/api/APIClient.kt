@@ -70,6 +70,13 @@ class APIClient(
             }
             .body<QueryDatabaseResponse>()
 
+    suspend fun createPageOrThrow(body: CreatePageRequest) =
+        httpClient
+            .post("$API_BASE_URL/pages") {
+                setBody(body)
+            }
+            .body<ExpensePageResponse>()
+
     suspend fun updatePage(
         id: ExpenseId,
         body: UpdatePageRequest,
