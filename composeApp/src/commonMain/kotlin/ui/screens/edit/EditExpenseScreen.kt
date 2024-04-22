@@ -6,6 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -59,6 +60,25 @@ data class EditExpenseScreen(val expense: Expense? = null) : Screen {
                             onClick = { navigator.pop() },
                         ) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                        }
+                    },
+                    actions = {
+                        expense?.let {
+                            IconButton(
+                                enabled = state.formStatus !is FormStatus.Submitting,
+                                onClick = {
+                                    coroutineScope.launch {
+                                        try {
+                                            viewModel.archive()
+                                            navigator.pop()
+                                        } catch (e: Throwable) {
+                                            logger.error { e.message ?: "Something went wrong" }
+                                        }
+                                    }
+                                },
+                            ) {
+                                Icon(Icons.Default.Delete, contentDescription = null)
+                            }
                         }
                     },
                 )
