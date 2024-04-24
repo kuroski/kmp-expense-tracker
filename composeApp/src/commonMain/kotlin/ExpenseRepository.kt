@@ -5,6 +5,7 @@ import api.toDomain
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.flow.StateFlow
+import org.expense.tracker.database.MyDatabase
 import org.koin.core.component.KoinComponent
 
 private val logger = KotlinLogging.logger {}
@@ -13,8 +14,12 @@ class ExpenseRepository(
     private val databaseId: String,
     private val apiClient: APIClient,
     private val expenseStorage: ExpenseStorage,
+    private val database: MyDatabase
 ) : KoinComponent, Closeable {
     suspend fun all(forceUpdate: Boolean = false): StateFlow<List<Expense>> {
+        logger.debug { "Using sqldelight DB" }
+        logger.debug { database.expensesQueries.selectAll().executeAsList() }
+
         val expenses = expenseStorage.getExpenses()
 
         if (forceUpdate || expenses.value.isEmpty()) {

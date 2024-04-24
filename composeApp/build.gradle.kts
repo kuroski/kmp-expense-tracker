@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.buildKonfig)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
@@ -52,10 +53,12 @@ kotlin {
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+            implementation(libs.sqldelight.jvm)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
             implementation(libs.stately.common)
+            implementation(libs.sqldelight.native)
         }
 
         all {
@@ -83,5 +86,13 @@ buildkonfig {
     defaultConfigs {
         buildConfigField(STRING, "NOTION_TOKEN", env.fetchOrNull("NOTION_TOKEN") ?: "")
         buildConfigField(STRING, "NOTION_DATABASE_ID", env.fetchOrNull("NOTION_DATABASE_ID") ?: "")
+    }
+}
+
+sqldelight {
+    databases {
+        create("MyDatabase") {
+            packageName.set("org.expense.tracker.database")
+        }
     }
 }
