@@ -1,20 +1,23 @@
 -- Create the table expenses
-CREATE TABLE expenses(
+CREATE TABLE expense(
 id TEXT NOT NULL PRIMARY KEY,
 name TEXT NOT NULL,
 icon TEXT,
 price INTEGER NOT NULL
 );
 
--- Create the queries to work with the table expenses
+-- Create the queries to work with the table expense
 selectAll:
-SELECT * FROM expenses;
+SELECT * FROM expense;
 
 selectById:
-SELECT * FROM expenses WHERE id = ?;
+SELECT * FROM expense WHERE id = ?;
 
 upsert:
-INSERT OR REPLACE INTO expenses (id, name, icon, price) VALUES (?,?,?,?);
+INSERT OR REPLACE INTO expense (id, name, icon, price) VALUES (?,?,?,?);
 
 delete:
-DELETE FROM expenses WHERE id = ?;
+DELETE FROM expense WHERE id = ?;
+
+deleteAll:
+DELETE FROM expense;

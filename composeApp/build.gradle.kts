@@ -49,6 +49,7 @@ kotlin {
             implementation(libs.voyager.screenModel)
             implementation(libs.voyager.transitions)
             implementation(libs.voyager.koin)
+            implementation(libs.sqldelight.coroutines.extensions)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
