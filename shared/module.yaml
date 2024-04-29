@@ -1,0 +1,46 @@
+product:
+    type: lib
+    platforms: [jvm, iosArm64, iosSimulatorArm64, iosX64]
+
+dependencies:
+    - $compose.runtime
+    - $compose.foundation
+    - $compose.material3
+    - $compose.ui
+    - $compose.components.resources
+    - $compose.animation
+    - $compose.materialIconsExtended
+    - $libs.ktor.client.core
+    - $libs.ktor.client.cio
+    - $libs.ktor.client.logging
+    - $libs.ktor.client.auth
+    - $libs.ktor.client.content.negotiation
+    - $libs.ktor.serialization.kotlinx.json
+    - $libs.koin.core
+    - $libs.koin.compose
+    - $libs.logback.classic
+    - $libs.kotlin.logging
+    - $libs.voyager.navigator
+    - $libs.voyager.screenModel
+    - $libs.voyager.transitions
+    - $libs.voyager.koin
+    - $libs.sqldelight.coroutines.extensions
+
+dependencies@jvm:
+    - $compose.desktop.currentOs
+    - $libs.kotlinx.coroutines.swing
+    - $libs.sqldelight.jvm
+
+dependencies@ios:
+    - $libs.ktor.client.darwin
+    - $libs.stately.common
+    - $libs.sqldelight.native
+
+settings:
+    compose: enabled
+    kotlin:
+        serialization: json
+        optIns:
+            - androidx.compose.material3.ExperimentalMaterial3Api
+    jvm:
+        target: 21
