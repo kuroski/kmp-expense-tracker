@@ -5,6 +5,9 @@ dependencies:
 
 settings:
     compose: enabled
+    kotlin:
+        freeCompilerArgs:
+            - -Xbinary=bundleId=org.expense.tracker.ExpenseTrackerApp
     ios:
         teamId: <your team ID here>
  

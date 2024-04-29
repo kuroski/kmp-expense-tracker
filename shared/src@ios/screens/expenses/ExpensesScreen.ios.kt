@@ -17,29 +17,29 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import ui.theme.Spacing
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 actual fun ExpenseListItemContainer(
     onDeleteClicked: () -> Unit,
     children: @Composable () -> Unit,
 ) {
-    val dismissState = rememberSwipeToDismissBoxState(
+    val dismissState = rememberDismissState(
         confirmValueChange = {
-            if (it == SwipeToDismissBoxValue.EndToStart) onDeleteClicked()
-            false
+            if (it == DismissValue.DismissedToStart) onDeleteClicked()
+            true
         },
     )
-    SwipeToDismissBox(
+    SwipeToDismiss(
         state = dismissState,
-        backgroundContent = {
+        directions = setOf(DismissDirection.EndToStart),
+        background = {
             val color by animateColorAsState(
-                if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart)
+                if (dismissState.targetValue == DismissValue.DismissedToStart)
                     MaterialTheme.colorScheme.errorContainer
                 else
                     Color.Transparent,
             )
             val scale by animateFloatAsState(
-                if (dismissState.targetValue == SwipeToDismissBoxValue.Settled) 0.75f else 1f,
+                if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f,
             )
 
             Box(
@@ -55,9 +55,9 @@ actual fun ExpenseListItemContainer(
                     modifier = Modifier.scale(scale),
                 )
             }
-
-        }
-    ) {
-        children()
-    }
+        },
+        dismissContent = {
+            children()
+        },
+    )
 }
