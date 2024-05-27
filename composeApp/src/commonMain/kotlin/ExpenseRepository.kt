@@ -1,4 +1,5 @@
 import api.APIClient
+import api.UpdatePageRequest
 import api.toDomain
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.utils.io.core.*
@@ -23,6 +24,12 @@ class ExpenseRepository(
 
         logger.debug { "Loading all expenses" }
         return expenses
+    }
+
+    suspend fun updateOrThrow(expense: Expense) {
+        logger.debug { "Updating expense ${expense.name}" }
+        apiClient.updatePage(expense.id, UpdatePageRequest.from(expense))
+        expenseStorage.updateExpense(expense)
     }
 
     override fun close() {

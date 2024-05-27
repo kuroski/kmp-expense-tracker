@@ -1,5 +1,6 @@
 package api
 
+import ExpenseId
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.*
@@ -68,6 +69,15 @@ class APIClient(
                 setBody(query)
             }
             .body<QueryDatabaseResponse>()
+
+    suspend fun updatePage(
+        id: ExpenseId,
+        body: UpdatePageRequest,
+    ) = httpClient
+        .patch("$API_BASE_URL/pages/$id") {
+            setBody(body)
+        }
+        .body<ExpensePageResponse>()
 
     override fun close() = httpClient.close()
 }

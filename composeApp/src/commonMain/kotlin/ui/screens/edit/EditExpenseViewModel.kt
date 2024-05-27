@@ -18,7 +18,7 @@ data class FormData(
 ) {
     val isValid get() = listOf(name, icon, price).all { it is FieldState.Valid }
 
-    val amount
+    val intPrice
         get() =
             when (price) {
                 is FieldState.Valid -> price.text.toIntOrNull() ?: 0
@@ -100,9 +100,13 @@ class EditExpenseViewModel(
         val icon = (formData.icon as FieldState.Valid).text
 
         if (expense != null) {
-            logger.info { "Upading expense" }
-            logger.info { formData }
-            delay(3_000)
+            expenseRepository.updateOrThrow(
+                expense.copy(
+                    name = (formData.name as FieldState.Valid).text,
+                    price = formData.intPrice,
+                    icon = icon.ifEmpty { null },
+                ),
+            )
         } else {
             logger.info { "Creating new expense" }
             logger.info { formData }
