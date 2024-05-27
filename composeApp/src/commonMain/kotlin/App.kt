@@ -1,11 +1,12 @@
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
+import ui.screens.expenses.ExpensesScreen
 import ui.theme.AppTheme
 
 @Composable
@@ -16,22 +17,9 @@ fun App() {
             color = MaterialTheme.colorScheme.background,
         ) {
             Scaffold {
-                Navigator(HelloWorldScreen) { navigator ->
+                Navigator(ExpensesScreen) { navigator ->
                     SlideTransition(navigator)
                 }
-            }
-        }
-    }
-}
-
-object HelloWorldScreen : Screen {
-
-    @Composable
-    override fun Content() {
-        Column {
-            Text("Hello World!")
-            Button(onClick = {}) {
-                Text("Click here!")
             }
         }
     }
