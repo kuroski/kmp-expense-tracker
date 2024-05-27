@@ -13,13 +13,9 @@ private val logger = KotlinLogging.logger {}
 class ExpenseRepository(
     private val databaseId: String,
     private val apiClient: APIClient,
-    private val expenseStorage: ExpenseStorage,
-    private val database: MyDatabase
+    private val expenseStorage: ExpenseStorage
 ) : KoinComponent, Closeable {
     suspend fun all(forceUpdate: Boolean = false): StateFlow<List<Expense>> {
-        logger.debug { "Using sqldelight DB" }
-        logger.debug { database.expensesQueries.selectAll().executeAsList() }
-
         val expenses = expenseStorage.getExpenses()
 
         if (forceUpdate || expenses.value.isEmpty()) {
