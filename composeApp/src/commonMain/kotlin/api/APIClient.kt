@@ -1,6 +1,7 @@
 package api
 
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.engine.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.auth.*
@@ -12,6 +13,8 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.json.Json
+
+typealias DatabaseId = String
 
 expect fun clientEngine(): HttpClientEngine
 
@@ -55,6 +58,16 @@ class APIClient(
         const val NOTION_HEADER_VERSION: String = "2021-08-16"
         const val API_BASE_URL: String = "https://api.notion.com/v1"
     }
+
+    suspend fun queryDatabaseOrThrow(
+        databaseId: DatabaseId,
+        query: QueryDatabaseRequest = QueryDatabaseRequest(),
+    ): QueryDatabaseResponse =
+        httpClient
+            .post("$API_BASE_URL/databases/$databaseId/query") {
+                setBody(query)
+            }
+            .body<QueryDatabaseResponse>()
 
     override fun close() = httpClient.close()
 }
