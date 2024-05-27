@@ -206,7 +206,7 @@ private fun ExpenseListItem(
                 modifier = Modifier.weight(1f),
             )
             Text(
-                text = (expense.price).toString(),
+                text = (expense.formattedPrice),
                 style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
             )
         }

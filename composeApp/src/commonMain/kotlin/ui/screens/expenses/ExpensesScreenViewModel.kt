@@ -4,6 +4,7 @@ import Expense
 import api.APIClient
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import formatPrice
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.launch
 import utils.Env
@@ -17,7 +18,7 @@ data class ExpensesScreenState(
     val data: RemoteData<Throwable, List<Expense>>,
 ) {
     val avgExpenses: String
-        get() = data.getOrElse(emptyList()).map { it.price }.average().toString()
+        get() = formatPrice(lastSuccessData.map { it.price }.average().toInt())
 }
 
 class ExpensesScreenViewModel(private val apiClient: APIClient) : StateScreenModel<ExpensesScreenState>(
