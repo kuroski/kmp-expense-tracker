@@ -9,7 +9,9 @@ object Koin {
         module {
             single<SnackbarHostState> { SnackbarHostState() }
             single<APIClient> { APIClient(Env.NOTION_TOKEN) }
+            single<ExpenseStorage> { InMemoryExpenseStorage() }
+            single { ExpenseRepository(Env.NOTION_DATABASE_ID, get(), get()) }
 
-            factory { ExpensesScreenViewModel(apiClient = get()) }
+            factory { ExpensesScreenViewModel(expenseRepository = get()) }
         }
 }
