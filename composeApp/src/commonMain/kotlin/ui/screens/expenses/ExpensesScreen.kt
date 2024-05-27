@@ -17,8 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.koin.compose.koinInject
+import ui.screens.edit.EditExpenseScreen
 import ui.theme.BorderRadius
 import ui.theme.IconSize
 import ui.theme.Spacing
@@ -31,12 +34,11 @@ object ExpensesScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
         val snackbarHostState = koinInject<SnackbarHostState>()
         val viewModel = getScreenModel<ExpensesScreenViewModel>()
         val state by viewModel.state.collectAsState()
-        val onExpenseClicked: (Expense) -> Unit = {
-            logger.info { "Redirect to edit screen" }
-        }
+        val onExpenseClicked: (Expense) -> Unit = { navigator.push(EditExpenseScreen(it)) }
 
         LaunchedEffect(state.data) {
             val remoteData = state.data
