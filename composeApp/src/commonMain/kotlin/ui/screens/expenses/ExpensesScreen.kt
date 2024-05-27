@@ -5,8 +5,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -18,10 +21,13 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import ui.theme.BorderRadius
 import ui.theme.IconSize
 import ui.theme.Spacing
+import ui.theme.Width
+import utils.RemoteData
 
 private val logger = KotlinLogging.logger {}
 
 object ExpensesScreen : Screen {
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val viewModel = getScreenModel<ExpensesScreenViewModel>()
@@ -30,9 +36,24 @@ object ExpensesScreen : Screen {
             logger.info { "Redirect to edit screen" }
         }
 
+        LaunchedEffect(state.data) {
+            val remoteData = state.data
+            if (remoteData is RemoteData.Failure) {
+                logger.error { remoteData.error.message ?: "Something went wrong" }
+            }
+        }
+
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
+                    navigationIcon = {
+                        IconButton(
+                            enabled = state.data !is RemoteData.Loading,
+                            onClick = { viewModel.fetchExpenses() },
+                        ) {
+                            Icon(Icons.Default.Refresh, contentDescription = null)
+                        }
+                    },
                     title = {
                         Text("My subscriptions", style = MaterialTheme.typography.titleMedium)
                     },
@@ -66,7 +87,44 @@ object ExpensesScreen : Screen {
             },
         ) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
-                ExpenseList(state.data, onExpenseClicked)
+                when (val remoteData = state.data) {
+                    is RemoteData.NotAsked, is RemoteData.Loading -> {
+                        Column {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(Spacing.Small_100),
+                                verticalArrangement = Arrangement.spacedBy(Spacing.Small_100),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.width(Width.Medium),
+                                )
+                            }
+                        }
+                    }
+
+                    is RemoteData.Failure -> {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(
+                                Spacing.Small,
+                                alignment = Alignment.CenterVertically
+                            ),
+                        ) {
+                            Text("Oops, something went wrong", style = MaterialTheme.typography.titleMedium)
+                            Text("Try refreshing")
+                            FilledIconButton(
+                                onClick = { viewModel.fetchExpenses() },
+                            ) {
+                                Icon(Icons.Default.Refresh, contentDescription = null)
+                            }
+                        }
+                    }
+
+                    is RemoteData.Success -> {
+                        ExpenseList(remoteData.data, onExpenseClicked)
+                    }
+                }
             }
         }
     }

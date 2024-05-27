@@ -7,36 +7,51 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.launch
 import utils.Env
+import utils.RemoteData
+import utils.getOrElse
 
 private val logger = KotlinLogging.logger {}
 
 data class ExpensesScreenState(
-    val data: List<Expense>,
+    val data: RemoteData<Throwable, List<Expense>>,
 ) {
     val avgExpenses: String
-        get() = data.map { it.price }.average().toString()
+        get() = data.getOrElse(emptyList()).map { it.price }.average().toString()
 }
 
-class ExpensesScreenViewModel(apiClient: APIClient) : StateScreenModel<ExpensesScreenState>(
+class ExpensesScreenViewModel(private val apiClient: APIClient) : StateScreenModel<ExpensesScreenState>(
     ExpensesScreenState(
-        data = listOf(),
+        data = RemoteData.NotAsked,
     ),
 ) {
     init {
+        fetchExpenses()
+    }
+
+    fun fetchExpenses() {
+        mutableState.value = mutableState.value.copy(data = RemoteData.Loading)
+
         screenModelScope.launch {
-            logger.info { "Fetching expenses" }
-            val database = apiClient.queryDatabaseOrThrow(Env.NOTION_DATABASE_ID)
-            val expenses = database.results.map {
-                Expense(
-                    id = it.id,
-                    name = it.properties.expense.title.firstOrNull()?.plainText ?: "-",
-                    icon = it.icon?.emoji,
-                    price = it.properties.amount.number,
-                )
+            try {
+                logger.info { "Fetching expenses" }
+                val database = apiClient.queryDatabaseOrThrow(Env.NOTION_DATABASE_ID)
+                val expenses = database.results.map {
+                    Expense(
+                        id = it.id,
+                        name = it.properties.expense.title.firstOrNull()?.plainText ?: "-",
+                        icon = it.icon?.emoji,
+                        price = it.properties.amount.number,
+                    )
+                }
+                mutableState.value =
+                    ExpensesScreenState(
+                        data = RemoteData.success(expenses),
+                    )
+            } catch (cause: Throwable) {
+                logger.error { "Cause ${cause.message}" }
+                cause.printStackTrace()
+                mutableState.value = mutableState.value.copy(data = RemoteData.failure(cause))
             }
-            mutableState.value = ExpensesScreenState(
-                data = expenses
-            )
         }
     }
 }
