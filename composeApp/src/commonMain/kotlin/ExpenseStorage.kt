@@ -1,4 +1,3 @@
-
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.*
 
@@ -12,8 +11,6 @@ interface ExpenseStorage {
     suspend fun updateExpense(newExpense: Expense)
 
     suspend fun removeExpense(expense: Expense)
-
-    fun findExpense(id: ExpenseId): Flow<Expense?>
 
     fun getExpenses(): StateFlow<List<Expense>>
 }
@@ -45,11 +42,6 @@ class InMemoryExpenseStorage : ExpenseStorage {
     override suspend fun removeExpense(expense: Expense) =
         storedExpenses.update { expenses: List<Expense> ->
             expenses.filter { it.id != expense.id }
-        }
-
-    override fun findExpense(id: ExpenseId): Flow<Expense?> =
-        storedExpenses.map { expenses ->
-            expenses.find { it.id == id }
         }
 
     override fun getExpenses(): StateFlow<List<Expense>> = storedExpenses.asStateFlow()

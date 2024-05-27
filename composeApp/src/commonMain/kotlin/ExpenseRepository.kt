@@ -1,4 +1,5 @@
 import api.APIClient
+import api.CreatePageRequest
 import api.UpdatePageRequest
 import api.toDomain
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -24,6 +25,12 @@ class ExpenseRepository(
 
         logger.debug { "Loading all expenses" }
         return expenses
+    }
+
+    suspend fun createOrThrow(expense: Expense) {
+        logger.debug { "Updating expense ${expense.name}" }
+        val response = apiClient.createPageOrThrow(CreatePageRequest.from(expense))
+        expenseStorage.createExpense(expense.copy(id = response.id))
     }
 
     suspend fun updateOrThrow(expense: Expense) {

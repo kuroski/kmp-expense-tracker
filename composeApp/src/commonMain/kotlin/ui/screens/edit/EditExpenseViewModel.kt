@@ -1,10 +1,10 @@
 package ui.screens.edit
 
 import Expense
+import ExpenseId
 import ExpenseRepository
 import cafe.adriel.voyager.core.model.StateScreenModel
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.delay
 import utils.form.FieldState
 import utils.form.FormStatus
 import utils.form.getOrNull
@@ -108,9 +108,14 @@ class EditExpenseViewModel(
                 ),
             )
         } else {
-            logger.info { "Creating new expense" }
-            logger.info { formData }
-            delay(3_000)
+            expenseRepository.createOrThrow(
+                Expense(
+                    id = ExpenseId(),
+                    name = (formData.name as FieldState.Valid).text,
+                    price = formData.intPrice,
+                    icon = icon.ifEmpty { null },
+                ),
+            )
         }
 
         mutableState.value = state.value.copy(formStatus = FormStatus.Submitted)
