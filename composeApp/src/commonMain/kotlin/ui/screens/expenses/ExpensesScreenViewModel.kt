@@ -13,6 +13,7 @@ import utils.getOrElse
 private val logger = KotlinLogging.logger {}
 
 data class ExpensesScreenState(
+    val lastSuccessData: List<Expense> = emptyList(),
     val data: RemoteData<Throwable, List<Expense>>,
 ) {
     val avgExpenses: String
@@ -45,6 +46,7 @@ class ExpensesScreenViewModel(private val apiClient: APIClient) : StateScreenMod
                 }
                 mutableState.value =
                     ExpensesScreenState(
+                        lastSuccessData = expenses,
                         data = RemoteData.success(expenses),
                     )
             } catch (cause: Throwable) {
