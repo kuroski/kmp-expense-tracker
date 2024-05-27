@@ -40,6 +40,7 @@ object ExpensesScreen : Screen {
         val viewModel = getScreenModel<ExpensesScreenViewModel>()
         val state by viewModel.state.collectAsState()
         val onExpenseClicked: (Expense) -> Unit = { navigator.push(EditExpenseScreen(it)) }
+        val onDeleteClicked: (Expense) -> Unit = viewModel::archiveExpense
 
         LaunchedEffect(state.data) {
             val remoteData = state.data
@@ -114,7 +115,8 @@ object ExpensesScreen : Screen {
                             }
                             ExpenseList(
                                 state.lastSuccessData,
-                                onExpenseClicked,
+                                onClick = onExpenseClicked,
+                                onDelete = onDeleteClicked
                             )
                         }
                     }
@@ -123,7 +125,8 @@ object ExpensesScreen : Screen {
                         if (state.lastSuccessData.isNotEmpty()) {
                             ExpenseList(
                                 state.lastSuccessData,
-                                onExpenseClicked,
+                                onClick = onExpenseClicked,
+                                onDelete = onDeleteClicked
                             )
                         } else {
                             Column(
@@ -146,7 +149,11 @@ object ExpensesScreen : Screen {
                     }
 
                     is RemoteData.Success -> {
-                        ExpenseList(remoteData.data, onExpenseClicked)
+                        ExpenseList(
+                            remoteData.data,
+                            onClick = onExpenseClicked,
+                            onDelete = onDeleteClicked
+                        )
                     }
                 }
             }
@@ -158,6 +165,7 @@ object ExpensesScreen : Screen {
 private fun ExpenseList(
     expenses: List<Expense>,
     onClick: (expense: Expense) -> Unit,
+    onDelete: (expense: Expense) -> Unit,
 ) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(Spacing.Small_100),
@@ -166,13 +174,17 @@ private fun ExpenseList(
             items = expenses,
             key = { it.id },
         ) { expense ->
-            ExpenseListItem(
-                expense = expense,
-                onClick = {
-                    logger.info { "Clicked on ${expense.name}" }
-                    onClick(expense)
-                },
-            )
+            ExpenseListItemContainer(
+                onDeleteClicked = { onDelete(expense) },
+            ) {
+                ExpenseListItem(
+                    expense = expense,
+                    onClick = {
+                        logger.info { "Clicked on ${expense.name}" }
+                        onClick(expense)
+                    },
+                )
+            }
         }
 
         item {
@@ -180,6 +192,12 @@ private fun ExpenseList(
         }
     }
 }
+
+@Composable
+expect fun ExpenseListItemContainer(
+    onDeleteClicked: () -> Unit,
+    children: @Composable () -> Unit,
+)
 
 @Composable
 private fun ExpenseListItem(

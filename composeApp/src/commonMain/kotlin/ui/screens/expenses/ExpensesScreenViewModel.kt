@@ -28,6 +28,18 @@ class ExpensesScreenViewModel(private val expenseRepository: ExpenseRepository) 
         fetchExpenses()
     }
 
+    fun archiveExpense(expense: Expense) {
+        screenModelScope.launch {
+            try {
+                expenseRepository.archiveOrThrow(expense)
+                logger.info { "Expense ${expense.name} was archived" }
+            } catch (cause: Throwable) {
+                logger.error { "Cause ${cause.message}" }
+                cause.printStackTrace()
+            }
+        }
+    }
+
     fun fetchExpenses(forceUpdate: Boolean = false) {
         mutableState.value = mutableState.value.copy(data = RemoteData.Loading)
 
