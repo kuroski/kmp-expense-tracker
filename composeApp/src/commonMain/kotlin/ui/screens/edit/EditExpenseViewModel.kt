@@ -77,6 +77,10 @@ class EditExpenseViewModel(
         ),
     ),
 ) {
+    suspend fun archive() {
+        expense?.let { expenseRepository.archiveOrThrow(it) }
+    }
+
     fun onFieldChange(fieldValidator: FormData.(String) -> FormData): (String) -> Unit {
         return { newValue: String ->
             val newFormData = fieldValidator(state.value.formData, newValue)

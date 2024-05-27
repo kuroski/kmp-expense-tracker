@@ -86,5 +86,11 @@ class APIClient(
         }
         .body<ExpensePageResponse>()
 
+    suspend fun archivePageOrThrow(id: ExpenseId) =
+        httpClient
+            .patch("$API_BASE_URL/pages/$id") {
+                setBody(ArchivePageRequest(archived = true))
+            }
+
     override fun close() = httpClient.close()
 }

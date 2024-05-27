@@ -39,6 +39,12 @@ class ExpenseRepository(
         expenseStorage.updateExpense(expense)
     }
 
+    suspend fun archiveOrThrow(expense: Expense) {
+        logger.debug { "Updating expense ${expense.name}" }
+        apiClient.archivePageOrThrow(expense.id)
+        expenseStorage.removeExpense(expense)
+    }
+
     override fun close() {
         apiClient.close()
     }
