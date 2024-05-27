@@ -1,5 +1,6 @@
 package api
 
+import Expense
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -11,3 +12,6 @@ data class QueryDatabaseResponse(
     @SerialName("has_more")
     val hasMore: Boolean,
 )
+
+fun QueryDatabaseResponse.toDomain(): List<Expense> =
+    results.map { it.toDomain() }
