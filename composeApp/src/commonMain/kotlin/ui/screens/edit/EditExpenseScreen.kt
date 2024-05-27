@@ -12,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
@@ -20,7 +21,9 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.launch
 import org.koin.core.parameter.parametersOf
+import ui.components.InputField
 import ui.theme.Spacing
+import utils.form.CurrencyAmountInputVisualTransformation
 import utils.form.FieldState
 import utils.form.FormStatus
 import utils.form.getOrNull
@@ -111,50 +114,32 @@ fun Form(
     ) {
         Text("Emoji picker")
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(Spacing.Small_100),
-        ) {
-            Text(
-                text = "Name",
-                style = MaterialTheme.typography.bodyLarge,
-            )
-            TextField(
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = {
-                    Text(text = "Please type the expense name")
-                },
-                value = state.formData.name.getOrNull() ?: "",
-                onValueChange = viewModel.onFieldChange(FormData::validateName),
-                isError = when {
-                    state.formStatus !is FormStatus.Submitted -> false
-                    (state.formData.name as? FieldState.Invalid)?.error != null -> true
-                    else -> false
-                },
-                singleLine = true,
-            )
-        }
+        InputField(
+            label = "Name",
+            placeholder = "Please type the expense name",
+            value = (state.formData.name as? FieldState.Valid)?.text,
+            onValueChange = viewModel.onFieldChange(FormData::validateName),
+            error =
+            if (state.formStatus !is FormStatus.Submitted) {
+                null
+            } else {
+                (state.formData.name as? FieldState.Invalid)?.error
+            },
+        )
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(Spacing.Small_100),
-        ) {
-            Text(
-                text = "Price",
-                style = MaterialTheme.typography.bodyLarge,
-            )
-            TextField(
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = {
-                    Text(text = "Please type the expense price")
-                },
-                value = state.formData.price.getOrNull() ?: "",
-                onValueChange = viewModel.onFieldChange(FormData::validatePrice),
-                isError = when {
-                    state.formStatus !is FormStatus.Submitted -> false
-                    (state.formData.price as? FieldState.Invalid)?.error != null -> true
-                    else -> false
-                },
-                singleLine = true,
-            )
-        }
+        InputField(
+            keyboardType = KeyboardType.NumberPassword,
+            visualTransformation = CurrencyAmountInputVisualTransformation(),
+            label = "Price",
+            placeholder = "Please type the expense price",
+            value = (state.formData.price as? FieldState.Valid)?.text,
+            onValueChange = viewModel.onFieldChange(FormData::validatePrice),
+            error =
+            if (state.formStatus !is FormStatus.Submitted) {
+                null
+            } else {
+                (state.formData.price as? FieldState.Invalid)?.error
+            },
+        )
     }
 }
