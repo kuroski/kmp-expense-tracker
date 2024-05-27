@@ -1,11 +1,12 @@
 package ui.screens.expenses
 
 import Expense
+import api.APIClient
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import utils.Env
 
 private val logger = KotlinLogging.logger {}
 
@@ -16,7 +17,7 @@ data class ExpensesScreenState(
         get() = data.map { it.price }.average().toString()
 }
 
-class ExpensesScreenViewModel : StateScreenModel<ExpensesScreenState>(
+class ExpensesScreenViewModel(apiClient: APIClient) : StateScreenModel<ExpensesScreenState>(
     ExpensesScreenState(
         data = listOf(),
     ),
@@ -24,28 +25,17 @@ class ExpensesScreenViewModel : StateScreenModel<ExpensesScreenState>(
     init {
         screenModelScope.launch {
             logger.info { "Fetching expenses" }
-            delay(3000)
-            mutableState.value = ExpensesScreenState(
-                data = listOf(
-                    Expense(
-                        id = "1",
-                        name = "Rent",
-                        icon = "🏠",
-                        price = 102573,
-                    ),
-                    Expense(
-                        id = "2",
-                        name = "Apple one",
-                        icon = "🍎",
-                        price = 2595,
-                    ),
-                    Expense(
-                        id = "3",
-                        name = "Netflix",
-                        icon = "📺",
-                        price = 1299,
-                    ),
+            val database = apiClient.queryDatabaseOrThrow(Env.NOTION_DATABASE_ID)
+            val expenses = database.results.map {
+                Expense(
+                    id = it.id,
+                    name = it.properties.expense.title.firstOrNull()?.plainText ?: "-",
+                    icon = it.icon?.emoji,
+                    price = it.properties.amount.number,
                 )
+            }
+            mutableState.value = ExpensesScreenState(
+                data = expenses
             )
         }
     }

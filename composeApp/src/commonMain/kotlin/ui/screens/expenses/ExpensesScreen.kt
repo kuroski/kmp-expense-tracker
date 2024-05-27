@@ -12,8 +12,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.getScreenModel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ui.theme.BorderRadius
 import ui.theme.IconSize
@@ -24,7 +24,7 @@ private val logger = KotlinLogging.logger {}
 object ExpensesScreen : Screen {
     @Composable
     override fun Content() {
-        val viewModel = rememberScreenModel { ExpensesScreenViewModel() }
+        val viewModel = getScreenModel<ExpensesScreenViewModel>()
         val state by viewModel.state.collectAsState()
         val onExpenseClicked: (Expense) -> Unit = {
             logger.info { "Redirect to edit screen" }
