@@ -13,9 +13,17 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlin.jvm.JvmInline
 
-typealias DatabaseId = String
+@Serializable
+@JvmInline
+value class DatabaseId(private val value: String) {
+    override fun toString(): String {
+        return value
+    }
+}
 
 expect fun clientEngine(): HttpClientEngine
 

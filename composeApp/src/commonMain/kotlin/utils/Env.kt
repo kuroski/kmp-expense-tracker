@@ -1,6 +1,8 @@
 package utils
 
+import api.DatabaseId
 import org.expense.tracker.BuildKonfig
+import kotlin.jvm.JvmInline
 
 object Env {
     val NOTION_TOKEN: String
@@ -10,10 +12,10 @@ object Env {
             return notionToken
         }
 
-    val NOTION_DATABASE_ID: String
+    val NOTION_DATABASE_ID: DatabaseId
         get() {
             val notionDatabaseId = BuildKonfig.NOTION_DATABASE_ID
             require(notionDatabaseId.isNotBlank()) { "You must provide a NOTION_DATABASE_ID env variable" }
-            return notionDatabaseId
+            return DatabaseId(notionDatabaseId)
         }
 }
