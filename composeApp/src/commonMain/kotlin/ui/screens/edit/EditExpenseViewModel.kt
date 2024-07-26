@@ -114,7 +114,7 @@ class EditExpenseViewModel(
         } else {
             expenseRepository.createOrThrow(
                 Expense(
-                    id = ExpenseId(),
+                    id = ExpenseId(""),
                     name = (formData.name as FieldState.Valid).text,
                     price = formData.intPrice,
                     icon = icon.ifEmpty { null },

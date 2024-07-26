@@ -1,8 +1,15 @@
 import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmInline
 
 expect fun formatPrice(amount: Int): String
 
-typealias ExpenseId = String
+@Serializable
+@JvmInline
+value class ExpenseId(private val value: String) {
+    override fun toString(): String {
+        return value
+    }
+}
 
 @Serializable
 data class Expense(
